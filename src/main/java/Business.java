@@ -12,6 +12,7 @@ public class Business implements Serializable {
     private HT termFrequency;
     private HT TF;
     private HT TFIDF;
+    private Double[] clusterDistance;
 
 
 
@@ -25,6 +26,16 @@ public class Business implements Serializable {
         TFIDF = new HT();
     }
 
+
+    //to string
+    @Override
+    public String toString() {
+        return "Business{" +
+                "name='" + name + '\'' +
+                ", businessID='" + businessID + '\'' +
+                ", cluster=" + cluster +
+                '}';
+    }
 
     //getters
     public String getName(){
@@ -47,6 +58,7 @@ public class Business implements Serializable {
     public HT getTF() { return  this.TF;}
     public int getCluster(){ return this.cluster;}
     public double getCosineSimilarity() {return cosineSimilarity;}
+    public Double[] getClusterDistance() {return clusterDistance;}
 
 
     //Setter
@@ -67,6 +79,7 @@ public class Business implements Serializable {
     public void setTFIDF(HT TFIDF) {this.TFIDF = TFIDF;}
     public void setCosineSimilarity(double cosineSimilarity) {this.cosineSimilarity = cosineSimilarity;}
 
+    public void setClusterDistance(Double[] clusterDistance) {this.clusterDistance = clusterDistance;}
 
     //other methods
     public void addTFIDF(String term, double termTFIDF){

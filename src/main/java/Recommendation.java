@@ -1,7 +1,6 @@
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import javax.swing.text.html.HTMLWriter;
 import java.io.*;
 import java.util.*;
 
@@ -24,7 +23,6 @@ public class Recommendation {
 
 
         // ---=== READ AND RELATE BUSINESS, BUSINESS NAME, AND BUSINESS ID ===---
-        int numofBusinesses = 0;
         try{
             reader = new BufferedReader(new FileReader("dataset/yelp_academic_dataset_business.json"));
             String documentLine;
@@ -32,26 +30,17 @@ public class Recommendation {
                 JsonObject business = gson.fromJson(documentLine, JsonObject.class);
                 String id = String.valueOf(business.get("business_id")).substring(1,23);
                 String name = String.join(" ", String.valueOf(business.get("name")).split("[^a-zA-Z0-9'&-]+")).substring(1);
-                businessHashMap.put(id, new Business(id));
-                bNamesHashMap.put(id, name);
+                //Prevent business duplicates in the hashmaps
                 if(!BNames.containsKey(name)) {
+                    bNamesHashMap.put(id, name);
                     BNames.put(name, id);
+                    businessHashMap.put(id, new Business(id));
                 }
-                numofBusinesses++;
             }
         }
         catch (IOException e) {
             e.printStackTrace();
         }
-
-
-//        //map business id to business. Why? when I want a business I just have to look through the hashMap for the id as the key
-        for (Business business : businessHashMap.values()){
-            String id = String.valueOf(business.getBusinessID());
-            businessHashMap.put(id, new Business(id));
-        }
-
-
 
         //---=== READ AND RELATE BUSINESS, BUSINESS NAME, AND REVIEW ===---
         int numOfReviews = 0;
@@ -70,9 +59,7 @@ public class Recommendation {
         for (JsonObject jsonObject : businessReview) {
             if (jsonObject != null ){
                 String id = String.valueOf(jsonObject.get("business_id")).substring(1, 23);
-
                 String review = String.join(" ", String.valueOf(jsonObject.get("text")).split("[^a-zA-Z0-9'&]+"));
-                businessHashMap.put(id, new Business(id));
                 businessHashMap.get(id).setName(bNamesHashMap.get(id));
                 businessHashMap.get(id).setReview(review);
             }
@@ -166,6 +153,10 @@ public class Recommendation {
 
     // ---=== COSINE VECTOR ===---
     public static HashMap<String, Business>  cosineVector(String inputID){ //Cosinevector = (a * b)/( ( squart(A^2) )( squart(B^2) )
+
+        serializeBusinesses();
+        kMeansClusters();
+
         Business userBusiness = businessHashMap.get(inputID);
         HashMap<String, Double> similarityResults = new HashMap<>(); //Stores key-->id; value -->cosine vector result.
         HashMap<String, Business> nameToResult = new HashMap<>(); //key --> name; value --> similar business to the given
@@ -204,11 +195,11 @@ public class Recommendation {
             String name = bNamesHashMap.get(businessHashMap.get(reslt.getKey()).getBusinessID());
             double similarityResult = reslt.getValue();
             nameToResult.put(businessHashMap.get(reslt.getKey()).getBusinessID(), businessHashMap.get(BNames.get(name)));
-            System.out.println(name + ": " + similarityResult);
+            System.out.println(name + ": " + similarityResult + ";      Cluster: " + businessHashMap.get(reslt.getKey()).getCluster());
             System.out.println(businessHashMap.get(businessHashMap.get(reslt.getKey()).getBusinessID()).getReview());
         }
         System.out.println();
-        serializeBusinesses();
+
 //        for (Business b: businessHashMap.values()){
 //            if(b.getReview() != null){
 //                System.out.println(b);
@@ -257,18 +248,71 @@ public class Recommendation {
     }
 
     //clusters
-    public static void calculateKmeans(){
-        ArrayList<Double> firstC = new ArrayList<>();
-        ArrayList<Double> secondC = new ArrayList<>();
-        ArrayList<Double> thirdC = new ArrayList<>();
-        ArrayList<Double> fourthC = new ArrayList<>();
-        ArrayList<Double> fifthC = new ArrayList<>();
-        ArrayList<Double> sixthC = new ArrayList<>();
-        ArrayList<Double> seventhC = new ArrayList<>();
+    public static void kMeansClusters() {
+        // Initialize K cluster centroids randomly
+        ArrayList<Double> centroids = initializeCentroids(7); // Adjust 7 to the desired number of clusters
 
-        int numOfClusters = 7;
+        // Assign each data point to the nearest cluster centroid
+        assignToClusters(centroids);
 
+        // Repeat until convergence or maximum iterations
+        // Here you need to implement the convergence check and maximum iteration logic
+        // For simplicity, let's assume a fixed number of iterations
+        int maxIterations = 100;
+        for (int i = 0; i < maxIterations; i++) {
+            // Update cluster centroids based on the mean of data points assigned to each cluster
+            updateCentroids(centroids);
+
+            // Reassign data points to the updated centroids
+            assignToClusters(centroids);
+        }
+
+        // At this point, clusters should have converged, and you can do further processing or analysis
     }
+
+    private static ArrayList<Double> initializeCentroids(int k) {
+        // Initialize centroids randomly, for simplicity, let's generate random values between 0 and 1
+        ArrayList<Double> centroids = new ArrayList<>();
+        Random rand = new Random();
+        for (int i = 0; i < k; i++) {
+            centroids.add(rand.nextDouble());
+        }
+        return centroids;
+    }
+
+    private static void assignToClusters(ArrayList<Double> centroids) {
+        // Iterate through data points and assign them to the nearest cluster centroid
+        for (Business business : businessHashMap.values()) {
+            double minDistance = Double.MAX_VALUE;
+            int nearestCluster = -1;
+            for (int i = 0; i < centroids.size(); i++) {
+                double distance = Math.abs(business.getCosineSimilarity() - centroids.get(i));
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestCluster = i;
+                }
+            }
+            business.setCluster(nearestCluster);
+        }
+    }
+
+    private static void updateCentroids(ArrayList<Double> centroids) {
+        // Update centroids based on the mean of data points assigned to each cluster
+        for (int i = 0; i < centroids.size(); i++) {
+            double sum = 0;
+            int count = 0;
+            for (Business business : businessHashMap.values()) {
+                if (business.getCluster() == i) {
+                    sum += business.getCosineSimilarity();
+                    count++;
+                }
+            }
+            if (count != 0) {
+                centroids.set(i, sum / count);
+            }
+        }
+    }
+
 
 
     public static void main(String[] args) {
