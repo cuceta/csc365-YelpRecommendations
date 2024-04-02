@@ -1,11 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.jar.JarEntry;
 
 public class GUI {
     private JFrame frame;
@@ -78,7 +74,7 @@ public class GUI {
                 storedInput = input.getText();
 //                System.out.println(storedInput);
 
-                HashMap<String, Double> results = Recommendation.TFIDF(storedInput);
+                HashMap<String, Business> results = Recommendation.TFIDF(storedInput);
 //                System.out.println(Recommendation.TFIDF(storedInput).size());
 
                 updateRecs(results);
@@ -88,18 +84,18 @@ public class GUI {
         submitButton.addActionListener(submitRequest);
     }
 
-    private void updateRecs(HashMap<String, Double> recommendations) {
+    private void updateRecs(HashMap<String, Business> recommendations) {
         System.out.println(recommendations.keySet());
 
         JLabel rec1 = new JLabel();
         JLabel rec2 = new JLabel();
         int i = 0;
-        for (String word : recommendations.keySet()) {
-            if (recommendations.get(word) <= .9) {
+        for (String id : recommendations.keySet()) {
+            if (recommendations.get(id).getCosineSimilarity() <= .9) {
                 if (i == 0) {
-                    rec1.setText("[" + word + ": Similarity --> " + recommendations.get(word) + "]\n");
+                    rec1.setText("[" + recommendations.get(id).getName() + ": Similarity --> " + recommendations.get(id).getCosineSimilarity()+ "]\n");
                 } else if (i == 1) {
-                    rec2.setText("[" + word + ": Similarity --> " + recommendations.get(word) + "]\n");
+                    rec2.setText("[" + recommendations.get(id).getName() + ": Similarity --> " + recommendations.get(id).getCosineSimilarity() + "]\n");
                     break; // We only need top two recommendations
                 }
                 i++;

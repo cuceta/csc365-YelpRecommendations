@@ -3,10 +3,16 @@ import java.util.Hashtable;
 import java.io.Serializable;
 public class Business implements Serializable {
     private static final long serialVersionUID = 1L;
-    private String name, review, businessID;
+    private String name;
+    private String businessID;
+    private int cluster;
+
+    private String review;
+    private double cosineSimilarity;
     private HT termFrequency;
     private HT TF;
     private HT TFIDF;
+
 
 
 
@@ -18,6 +24,7 @@ public class Business implements Serializable {
         TF = new HT();
         TFIDF = new HT();
     }
+
 
     //getters
     public String getName(){
@@ -38,15 +45,14 @@ public class Business implements Serializable {
         return businessID;
     }
     public HT getTF() { return  this.TF;}
+    public int getCluster(){ return this.cluster;}
+    public double getCosineSimilarity() {return cosineSimilarity;}
 
 
     //Setter
     public void setTermFrequency(HT termFrequency) {
         this.termFrequency = termFrequency;
     }
-
-
-
     public void setName(String name){
         this.name = name;
     }
@@ -57,9 +63,14 @@ public class Business implements Serializable {
         this.review = review;
     }
     public  void  setTF (HT TF) { this.TF = TF;}
+    public void setCluster(int cluster){this.cluster = cluster;}
+    public void setTFIDF(HT TFIDF) {this.TFIDF = TFIDF;}
+    public void setCosineSimilarity(double cosineSimilarity) {this.cosineSimilarity = cosineSimilarity;}
 
-    //othe methods
+
+    //other methods
     public void addTFIDF(String term, double termTFIDF){
         this.TFIDF.add(term, termTFIDF);
     }
+
 }

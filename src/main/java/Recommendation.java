@@ -10,18 +10,16 @@ public class Recommendation {
     static HashMap<String, String> bNamesHashMap = new HashMap<>(); //key --> id; value --> Businesses names
     static HashMap<String, Business> businessHashMap = new HashMap<String, Business>(); //key --> id; value -->business
     static HashMap<String, String> BNames = new HashMap<>();//key --> name; Value --> id
-
     static HT wordFrequencyTable = new HT(); //key --> word; value --> count
-
     static PHT businessPHT; //key --> business name; value --> business ID file name
 
 
 
     // ---=== TDIDF ===---
-    public static HashMap<String, Double> TFIDF (String input) {
+    public static HashMap<String, Business> TFIDF (String input) {
         Gson gson = new Gson();
         BufferedReader reader;
-        JsonObject[] businessData = new JsonObject[150345], businessReview = new JsonObject[150345];
+        JsonObject[] businessData = new JsonObject[150345], businessReview = new JsonObject[6990280];
 
 
 
@@ -39,7 +37,6 @@ public class Recommendation {
                 if(!BNames.containsKey(name)) {
                     BNames.put(name, id);
                 }
-//                System.out.println(name + ": " + BNames.get(name));
                 numofBusinesses++;
             }
         }
@@ -81,10 +78,6 @@ public class Recommendation {
             }
         }
         System.out.println("A)  READ AND RELATE BUSINESS, BUSINESS ID, and business names ---> DONE");
-
-
-
-
 
         // ---=== FILL WORD FREQUENCY TABLE ===---
         for (Business business : businessHashMap.values()){
@@ -172,10 +165,10 @@ public class Recommendation {
 
 
     // ---=== COSINE VECTOR ===---
-    public static HashMap<String, Double>  cosineVector(String inputID){ //Cosinevector = (a * b)/( ( squart(A^2) )( squart(B^2) )
+    public static HashMap<String, Business>  cosineVector(String inputID){ //Cosinevector = (a * b)/( ( squart(A^2) )( squart(B^2) )
         Business userBusiness = businessHashMap.get(inputID);
-        HashMap<String, Double> similarityResults = new HashMap<>();
-        HashMap<String, Double> result = new HashMap<>(); //key --> name; value --> CSV result
+        HashMap<String, Double> similarityResults = new HashMap<>(); //Stores key-->id; value -->cosine vector result.
+        HashMap<String, Business> nameToResult = new HashMap<>(); //key --> name; value --> similar business to the given
 
         //calculate cosine vector
         for (Business business : businessHashMap.values()){
@@ -196,6 +189,8 @@ public class Recommendation {
             compareBusinessesMagn = Math.sqrt(compareBusinessesMagn);
             double csvResult = dotProductResult/((userBusinessMagn * compareBusinessesMagn)+0.0001);
             similarityResults.put(business.getBusinessID(), csvResult);
+            business.setCosineSimilarity(csvResult);
+            business.setName(bNamesHashMap.get(business.getBusinessID()));
         }
         List<Map.Entry<String, Double>> sortedResults = new ArrayList<>(similarityResults.entrySet());
         sortedResults.sort((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()));
@@ -206,16 +201,20 @@ public class Recommendation {
         System.out.println("Top " + mostSimilar + " similar businesses to " + userBusiness.getName() + ":");
         for (int i = 0; i < Math.min(mostSimilar, sortedResults.size()); i++) {
             Map.Entry<String, Double> reslt = sortedResults.get(i);
-            String similarBusinessName = businessHashMap.get(reslt.getKey()).getBusinessID();
             String name = bNamesHashMap.get(businessHashMap.get(reslt.getKey()).getBusinessID());
             double similarityResult = reslt.getValue();
-            result.put(name, similarityResult);
+            nameToResult.put(businessHashMap.get(reslt.getKey()).getBusinessID(), businessHashMap.get(BNames.get(name)));
             System.out.println(name + ": " + similarityResult);
             System.out.println(businessHashMap.get(businessHashMap.get(reslt.getKey()).getBusinessID()).getReview());
         }
         System.out.println();
         serializeBusinesses();
-        return result;
+//        for (Business b: businessHashMap.values()){
+//            if(b.getReview() != null){
+//                System.out.println(b);
+//            }
+//        }
+        return nameToResult;
     }
 
 
@@ -257,11 +256,25 @@ public class Recommendation {
 
     }
 
+    //clusters
+    public static void calculateKmeans(){
+        ArrayList<Double> firstC = new ArrayList<>();
+        ArrayList<Double> secondC = new ArrayList<>();
+        ArrayList<Double> thirdC = new ArrayList<>();
+        ArrayList<Double> fourthC = new ArrayList<>();
+        ArrayList<Double> fifthC = new ArrayList<>();
+        ArrayList<Double> sixthC = new ArrayList<>();
+        ArrayList<Double> seventhC = new ArrayList<>();
+
+        int numOfClusters = 7;
+
+    }
+
 
     public static void main(String[] args) {
-        String input = "Starbucks";
+        String input = "Bar-B-Cutie";
         TFIDF(input);
-//        System.out.println(bNamesHashMap.size());
+        System.out.println(businessHashMap.size());
     }
 
 
