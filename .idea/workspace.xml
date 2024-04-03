@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="6f0ed166-6e77-4721-97bd-2def3faa0be1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/src/main/java/Business.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Business.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Recommendation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Recommendation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Business.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Business.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Recommendation.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Recommendation.class" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 4
+}]]></component>
+  <component name="ProjectId" id="2eX0VPAHcigPbYsD9Clg7FGszSM" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.GUI.executor": "Run",
+    "Application.Recommendation.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "Reverting in main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/uceta/Documents/GitHub/csc365-YelpRecommendations"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="Recommendation" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Recommendation" />
+      <module name="Project1" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Recommendation" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="jdk-21.0.1-openjdk-21.0.1-4caba194b151-9b16c6e2" />
+        <option value="jdk-21.0.2-openjdk-21.0.2-4caba194b151-322ed176" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="6f0ed166-6e77-4721-97bd-2def3faa0be1" name="Changes" comment="" />
+      <created>1712035638140</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1712035638140</updated>
+    </task>
+    <servers />
+  </component>
+</project>

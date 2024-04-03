@@ -1,6 +1,4 @@
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.io.Serializable;
 public class Business implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -69,7 +67,7 @@ public class Business implements Serializable {
     public void setTFIDF(HT TFIDF) {this.TFIDF = TFIDF;}
     public void setCosineSimilarity(double cosineSimilarity) {this.cosineSimilarity = cosineSimilarity;}
 
-    public void addClusterDistanceArray(double clusterDistance) {this.clusterDistance.add(clusterDistance);}
+    public void addClusterDistanceArraylist(double clusterDistance) {this.clusterDistance.add(clusterDistance);}
 
     //other methods
     public void addTFIDF(String term, double termTFIDF){
