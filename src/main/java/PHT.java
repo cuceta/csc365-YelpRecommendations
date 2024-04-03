@@ -1,5 +1,7 @@
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Collection;
 
 class Bucket {
     static final int SLEN = 32; // max string length for keys and vals
@@ -38,7 +40,14 @@ class Bucket {
             if (key.equals(keys[j]))
                 return vals[j];
         }
-        return null; // Changed from false to null for String return type
+        return null;
+    }
+    String getKey(String value) {
+        for (int j = 0; j < count; ++j) {
+            if (value.equals(vals[j]))
+                return keys[j];
+        }
+        return null;
     }
 }
 
@@ -60,7 +69,7 @@ class PHT {
             indexArray = (IndexArray) new ObjectInputStream(new FileInputStream("INDEX")).readObject();
         else {
             indexArray = new IndexArray();
-            indexArray.index = new long[1000]; // Initial size
+            indexArray.index = new long[200000000]; // Initial size
         }
     }
     void put(String key, String value) throws IOException, ClassNotFoundException {
@@ -110,6 +119,50 @@ class PHT {
 
             writeBucket(raf, bucketPosition, bucket);
         }
+    }
+
+    String getValue(String key) throws IOException {
+        try (RandomAccessFile raf = new RandomAccessFile(bucketFile, "r")) {
+            long bucketPosition = indexArray.getBucketPosition(key);
+            ByteBuffer buffer = ByteBuffer.allocate(Bucket.BLOCKSIZE);
+            raf.seek(bucketPosition);
+            raf.getChannel().read(buffer);
+            buffer.flip();
+            Bucket bucket = new Bucket();
+            bucket.read(buffer);
+            return bucket.get(key);
+        }
+    }
+
+    String getKey(String value) throws IOException {
+        try (RandomAccessFile raf = new RandomAccessFile(bucketFile, "r")) {
+            long bucketPosition = indexArray.getBucketPosition(value);
+            ByteBuffer buffer = ByteBuffer.allocate(Bucket.BLOCKSIZE);
+            raf.seek(bucketPosition);
+            raf.getChannel().read(buffer);
+            buffer.flip();
+            Bucket bucket = new Bucket();
+            bucket.read(buffer);
+            return bucket.getKey(value);
+        }
+    }
+
+    Collection<String> values() throws IOException {
+        Collection<String> allValues = new ArrayList<>();
+        try (RandomAccessFile raf = new RandomAccessFile(bucketFile, "r")) {
+            for (long position : indexArray.index) {
+                ByteBuffer buffer = ByteBuffer.allocate(Bucket.BLOCKSIZE);
+                raf.seek(position);
+                raf.getChannel().read(buffer);
+                buffer.flip();
+                Bucket bucket = new Bucket();
+                bucket.read(buffer);
+                for (int i = 0; i < bucket.count; i++) {
+                    allValues.add(bucket.vals[i]);
+                }
+            }
+        }
+        return allValues;
     }
 
     private void writeBucket(RandomAccessFile raf, long position, Bucket bucket) throws IOException {

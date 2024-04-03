@@ -1,7 +1,6 @@
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import javax.swing.text.html.HTMLWriter;
 import java.io.*;
 import java.util.*;
 
@@ -15,8 +14,9 @@ public class Recommendation {
 
 
 
+
     // ---=== TDIDF ===---
-    public static HashMap<String, Business> TFIDF (String input) {
+    public static HashMap<String, Business> TFIDF (String input) throws IOException, ClassNotFoundException {
         Gson gson = new Gson();
         BufferedReader reader;
         JsonObject[] businessData = new JsonObject[150345], businessReview = new JsonObject[6990280];
@@ -165,9 +165,8 @@ public class Recommendation {
 
 
     // ---=== COSINE VECTOR ===---
-    public static HashMap<String, Business>  cosineVector(String inputID){ //Cosinevector = (a * b)/( ( squart(A^2) )( squart(B^2) )
+    public static HashMap<String, Business>  cosineVector(String inputID) throws IOException, ClassNotFoundException { //Cosinevector = (a * b)/( ( squart(A^2) )( squart(B^2) )
         serializeBusinesses();
-        makeClusters();
         Business userBusiness = businessHashMap.get(inputID);
         HashMap<String, Double> similarityResults = new HashMap<>(); //Stores key-->id; value -->cosine vector result.
         HashMap<String, Business> nameToResult = new HashMap<>(); //key --> name; value --> similar business to the given
@@ -215,7 +214,13 @@ public class Recommendation {
 //                System.out.println(b);
 //            }
 //        }
+        System.out.println("Now make clusters!");
+        makeClusters();
+//        System.out.println("Done with everything ---> Returning businessHashMap :)");
+//        return businessHashMap;
+        System.out.println("Done with everything ---> Returning nameToBusiness :)");
         return nameToResult;
+
     }
 
 
@@ -256,7 +261,6 @@ public class Recommendation {
         System.out.println("Businesses Serialized :)");
 
     }
-
     //clusters
     public static void makeClusters() {
         // Initialize K cluster centroids randomly
@@ -265,8 +269,10 @@ public class Recommendation {
         // Assign each data point to the nearest cluster centroid
         assignToClusters(centroids);
 
-        // Re-evaluate clusters to make them more accurate
-        int maxIterations = 100;
+        // Repeat until convergence or maximum iterations
+        // Here you need to implement the convergence check and maximum iteration logic
+        // For simplicity, let's assume a fixed number of iterations
+        int maxIterations = 1;
         for (int i = 0; i < maxIterations; i++) {
             // Update cluster centroids based on the mean of data points assigned to each cluster
             updateCentroids(centroids);
@@ -279,7 +285,7 @@ public class Recommendation {
     }
 
     private static ArrayList<Double> initializeCentroids(int k) {
-        // Initialize centroids randomly, for simplicity generate random values between 0 and 1
+        // Initialize centroids randomly, for simplicity, let's generate random values between 0 and 1
         ArrayList<Double> centroids = new ArrayList<>();
         Random rand = new Random();
         for (int i = 0; i < k; i++) {
@@ -323,10 +329,18 @@ public class Recommendation {
 
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
         String input = "Bar-B-Cutie";
         TFIDF(input);
+        int clusterCount = 0;
+        for (Business b : businessHashMap.values()){
+            System.out.println(b.toString());
+            if (b.getCluster() == 0){
+                clusterCount++;
+            }
+        }
         System.out.println(businessHashMap.size());
+        System.out.println(clusterCount);
     }
 
 

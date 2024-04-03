@@ -27,16 +27,6 @@ public class Business implements Serializable {
     }
 
 
-    //to string
-    @Override
-    public String toString() {
-        return "Business{" +
-                "name='" + name + '\'' +
-                ", businessID='" + businessID + '\'' +
-                ", cluster=" + cluster +
-                '}';
-    }
-
     //getters
     public String getName(){return name;}
     public HT getTFIDF() {return TFIDF;}
@@ -74,4 +64,12 @@ public class Business implements Serializable {
         this.TFIDF.add(term, termTFIDF);
     }
 
+    @Override
+    public String toString() {
+        return "Business{" +
+                "name='" + name + '\'' +
+                ", businessID='" + businessID + '\'' +
+                ", cluster=" + cluster +
+                '}';
+    }
 }
