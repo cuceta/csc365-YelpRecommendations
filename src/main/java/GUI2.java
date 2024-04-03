@@ -98,9 +98,9 @@ public class GUI2 {
         for (String id : recommendations.keySet()) {
             if (recommendations.get(id).getCosineSimilarity() <= 0.9) {
                 if (i == 0) {
-                    rec1.setText("[" + recommendations.get(id).getName() + ": Similarity --> " + recommendations.get(id).getCosineSimilarity() + "]\n");
+                    rec1.setText("\n[" + recommendations.get(id).getName() + ": Similarity --> " + recommendations.get(id).getCosineSimilarity() + "]\n");
                 } else if (i == 1) {
-                    rec2.setText("[" + recommendations.get(id).getName() + ": Similarity --> " + recommendations.get(id).getCosineSimilarity() + "]\n");
+                    rec2.setText("\n[" + recommendations.get(id).getName() + ": Similarity --> " + recommendations.get(id).getCosineSimilarity() + "]\n");
                     break; // We only need top two recommendations
                 }
                 i++;

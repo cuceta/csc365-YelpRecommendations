@@ -26,7 +26,7 @@ public class Recommendation {
         // ---=== READ AND RELATE BUSINESS, BUSINESS NAME, AND BUSINESS ID ===---
         int numofBusinesses = 0;
         try{
-            reader = new BufferedReader(new FileReader("dataset/yelp_academic_dataset_business.json"));
+            reader = new BufferedReader(new FileReader("yelp_dataset/yelp_academic_dataset_business.json"));
             String documentLine;
             while ( (documentLine = reader.readLine()) != null ){
                 JsonObject business = gson.fromJson(documentLine, JsonObject.class);
@@ -56,7 +56,7 @@ public class Recommendation {
         //---=== READ AND RELATE BUSINESS, BUSINESS NAME, AND REVIEW ===---
         int numOfReviews = 0;
         try{
-            reader = new BufferedReader(new FileReader("dataset/yelp_academic_dataset_review.json"));
+            reader = new BufferedReader(new FileReader("yelp_dataset/yelp_academic_dataset_review.json"));
             while (numOfReviews < businessData.length){
                 String documentLine = reader.readLine();
                 businessReview[numOfReviews] = gson.fromJson(documentLine, JsonObject.class);
@@ -263,44 +263,33 @@ public class Recommendation {
     }
     //clusters
     public static void makeClusters() {
-        // Initialize K cluster centroids randomly
-        ArrayList<Double> centroids = initializeCentroids(7); // Adjust 7 to the desired number of clusters
+        ArrayList<Double> listOfCentroids = centroids(7);        // Initialize K cluster centroids randomly
+        assignCentroidToClusters(listOfCentroids);        // Assign each data point to the nearest cluster centroid
 
-        // Assign each data point to the nearest cluster centroid
-        assignToClusters(centroids);
 
-        // Repeat until convergence or maximum iterations
-        // Here you need to implement the convergence check and maximum iteration logic
-        // For simplicity, let's assume a fixed number of iterations
-        int maxIterations = 1;
-        for (int i = 0; i < maxIterations; i++) {
-            // Update cluster centroids based on the mean of data points assigned to each cluster
-            updateCentroids(centroids);
-
-            // Reassign data points to the updated centroids
-            assignToClusters(centroids);
+        int numOfIterations = 100;
+        for (int i = 0; i < numOfIterations; i++) {
+            updateCentroidsAssignments(listOfCentroids);
+            assignCentroidToClusters(listOfCentroids);
         }
-
-        // At this point, clusters should have converged, and you can do further processing or analysis
     }
 
-    private static ArrayList<Double> initializeCentroids(int k) {
-        // Initialize centroids randomly, for simplicity, let's generate random values between 0 and 1
+    private static ArrayList<Double> centroids(int numOfCentroids) {
         ArrayList<Double> centroids = new ArrayList<>();
-        Random rand = new Random();
-        for (int i = 0; i < k; i++) {
-            centroids.add(rand.nextDouble());
+        Random r = new Random();
+        for (int i = 0; i < numOfCentroids; i++) {
+            centroids.add(r.nextDouble());
         }
         return centroids;
     }
 
-    private static void assignToClusters(ArrayList<Double> centroids) {
+    private static void assignCentroidToClusters(ArrayList<Double> listOfCentroids) {
         // Iterate through data points and assign them to the nearest cluster centroid
         for (Business business : businessHashMap.values()) {
             double minDistance = Double.MAX_VALUE;
             int nearestCluster = -1;
-            for (int i = 0; i < centroids.size(); i++) {
-                double distance = Math.abs(business.getCosineSimilarity() - centroids.get(i));
+            for (int i = 0; i < listOfCentroids.size(); i++) {
+                double distance = Math.abs(business.getCosineSimilarity() - listOfCentroids.get(i));
                 if (distance < minDistance) {
                     minDistance = distance;
                     nearestCluster = i;
@@ -310,9 +299,9 @@ public class Recommendation {
         }
     }
 
-    private static void updateCentroids(ArrayList<Double> centroids) {
+    private static void updateCentroidsAssignments(ArrayList<Double> listOfCentroids) {
         // Update centroids based on the mean of data points assigned to each cluster
-        for (int i = 0; i < centroids.size(); i++) {
+        for (int i = 0; i < listOfCentroids.size(); i++) {
             double sum = 0;
             int count = 0;
             for (Business business : businessHashMap.values()) {
@@ -322,7 +311,7 @@ public class Recommendation {
                 }
             }
             if (count != 0) {
-                centroids.set(i, sum / count);
+                listOfCentroids.set(i, sum / count);
             }
         }
     }
@@ -330,11 +319,11 @@ public class Recommendation {
 
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
-        String input = "Bar-B-Cutie";
+        String input = "Westshore Pizza";
         TFIDF(input);
         int clusterCount = 0;
         for (Business b : businessHashMap.values()){
-            System.out.println(b.toString());
+//            System.out.println(b.toString());
             if (b.getCluster() == 0){
                 clusterCount++;
             }

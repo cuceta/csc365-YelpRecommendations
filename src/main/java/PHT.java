@@ -194,7 +194,6 @@ class PHT {
             position = raf.getFilePointer();
             buffer.clear();
         }
-        // If no empty slot found, append new bucket to the end of the file
         return currentPosition;
     }
 }
