@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.io.Serializable;
@@ -12,7 +13,7 @@ public class Business implements Serializable {
     private HT termFrequency;
     private HT TF;
     private HT TFIDF;
-    private Double[] clusterDistance;
+    private ArrayList<Double> clusterDistance;
 
 
 
@@ -21,9 +22,10 @@ public class Business implements Serializable {
     public Business ( String businessID){
 //        this.name = name;
         this.businessID = businessID;
-        termFrequency = new HT();
-        TF = new HT();
-        TFIDF = new HT();
+        this.termFrequency = new HT();
+        this.TF = new HT();
+        this.TFIDF = new HT();
+        this.clusterDistance = new ArrayList<>();
     }
 
 
@@ -38,27 +40,15 @@ public class Business implements Serializable {
     }
 
     //getters
-    public String getName(){
-        return name;
-    }
-
-    public HT getTFIDF() {
-        return TFIDF;
-    }
-
-    public HT getTermFrequency(){
-        return termFrequency;
-    }
-    public String getReview(){
-        return review;
-    }
-    public String getBusinessID(){
-        return businessID;
-    }
+    public String getName(){return name;}
+    public HT getTFIDF() {return TFIDF;}
+    public HT getTermFrequency(){return termFrequency;}
+    public String getReview(){return review;}
+    public String getBusinessID(){return businessID;}
     public HT getTF() { return  this.TF;}
     public int getCluster(){ return this.cluster;}
     public double getCosineSimilarity() {return cosineSimilarity;}
-    public Double[] getClusterDistance() {return clusterDistance;}
+    public ArrayList<Double> getClusterDistance() {return clusterDistance;}
 
 
     //Setter
@@ -79,7 +69,7 @@ public class Business implements Serializable {
     public void setTFIDF(HT TFIDF) {this.TFIDF = TFIDF;}
     public void setCosineSimilarity(double cosineSimilarity) {this.cosineSimilarity = cosineSimilarity;}
 
-    public void setClusterDistance(Double[] clusterDistance) {this.clusterDistance = clusterDistance;}
+    public void addClusterDistanceArray(double clusterDistance) {this.clusterDistance.add(clusterDistance);}
 
     //other methods
     public void addTFIDF(String term, double termTFIDF){

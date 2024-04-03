@@ -255,9 +255,7 @@ public class Recommendation {
         // Assign each data point to the nearest cluster centroid
         assignToClusters(centroids);
 
-        // Repeat until convergence or maximum iterations
-        // Here you need to implement the convergence check and maximum iteration logic
-        // For simplicity, let's assume a fixed number of iterations
+        // Re-evaluate the clusters 100 so that they are more accurate
         int maxIterations = 100;
         for (int i = 0; i < maxIterations; i++) {
             // Update cluster centroids based on the mean of data points assigned to each cluster
@@ -287,6 +285,7 @@ public class Recommendation {
             int nearestCluster = -1;
             for (int i = 0; i < centroids.size(); i++) {
                 double distance = Math.abs(business.getCosineSimilarity() - centroids.get(i));
+                business.addClusterDistanceArray(distance);
                 if (distance < minDistance) {
                     minDistance = distance;
                     nearestCluster = i;
