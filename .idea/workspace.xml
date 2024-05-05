@@ -5,9 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6f0ed166-6e77-4721-97bd-2def3faa0be1" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/disjoint_sets.ser" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/Classes/Graph.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/Classes/Node.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Business.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Business.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Recommendation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Recommendation.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Business.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Business.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/PHT.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/PHT.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Recommendation.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Recommendation.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -28,28 +34,47 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 4
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
   <component name="ProjectId" id="2eX0VPAHcigPbYsD9Clg7FGszSM" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
     "Application.GUI.executor": "Run",
     "Application.GUI2.executor": "Run",
     "Application.GUI3.executor": "Run",
+    "Application.Graph.executor": "Run",
     "Application.Recommendation.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "Reverting in main",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/uceta/Documents/GitHub/csc365-YelpRecommendations"
   }
 }]]></component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Application.Recommendation">
+    <configuration name="Graph" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Classes.Graph" />
+      <module name="Project1" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="Classes.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Recommendation" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Recommendation" />
       <module name="Project1" />
@@ -60,6 +85,7 @@
     <recent_temporary>
       <list>
         <item itemvalue="Application.Recommendation" />
+        <item itemvalue="Application.Graph" />
       </list>
     </recent_temporary>
   </component>
@@ -81,5 +107,8 @@
       <updated>1712035638140</updated>
     </task>
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
 </project>

@@ -3,6 +3,8 @@ import java.io.Serializable;
 public class Business implements Serializable {
     private static final long serialVersionUID = 1L;
     private String name;
+    private double latitude;
+    private double longitude;
     private String businessID;
     private int cluster;
 
@@ -12,6 +14,8 @@ public class Business implements Serializable {
     private HT TF;
     private HT TFIDF;
     private ArrayList<Double> clusterDistance;
+
+
 
 
 
@@ -37,7 +41,12 @@ public class Business implements Serializable {
     public int getCluster(){ return this.cluster;}
     public double getCosineSimilarity() {return cosineSimilarity;}
     public ArrayList<Double> getClusterDistance() {return clusterDistance;}
-
+    public double getLatitude() {
+        return latitude;
+    }
+    public double getLongitude() {
+        return longitude;
+    }
 
     //Setter
     public void setTermFrequency(HT termFrequency) {
@@ -56,20 +65,28 @@ public class Business implements Serializable {
     public void setCluster(int cluster){this.cluster = cluster;}
     public void setTFIDF(HT TFIDF) {this.TFIDF = TFIDF;}
     public void setCosineSimilarity(double cosineSimilarity) {this.cosineSimilarity = cosineSimilarity;}
-
-    public void addClusterDistanceArraylist(double clusterDistance) {this.clusterDistance.add(clusterDistance);}
+    public void setClusterDistance(ArrayList<Double> clusterDistance) {
+        this.clusterDistance = clusterDistance;
+    }
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
 
     //other methods
     public void addTFIDF(String term, double termTFIDF){
         this.TFIDF.add(term, termTFIDF);
     }
+    public void addClusterDistanceArraylist(double clusterDistance) {this.clusterDistance.add(clusterDistance);}
 
     @Override
     public String toString() {
         return "Business{" +
                 "name='" + name + '\'' +
-                ", businessID='" + businessID + '\'' +
-                ", cluster=" + cluster +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
                 '}';
     }
 }
