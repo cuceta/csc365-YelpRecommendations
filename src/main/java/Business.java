@@ -1,13 +1,16 @@
 import java.util.ArrayList;
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
+
 public class Business implements Serializable {
     private static final long serialVersionUID = 1L;
     private String name;
     private double latitude;
     private double longitude;
+    private List<Business> closestNeighbors;
     private String businessID;
     private int cluster;
-
     private String review;
     private double cosineSimilarity;
     private HT termFrequency;
@@ -47,6 +50,9 @@ public class Business implements Serializable {
     public double getLongitude() {
         return longitude;
     }
+    public List<Business> getClosestNeighbors() {
+        return closestNeighbors;
+    }
 
     //Setter
     public void setTermFrequency(HT termFrequency) {
@@ -73,6 +79,10 @@ public class Business implements Serializable {
     }
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    public void setClosestNeighbors(List<Business> closestNeighbors) {
+        this.closestNeighbors = closestNeighbors;
     }
 
     //other methods

@@ -5,15 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6f0ed166-6e77-4721-97bd-2def3faa0be1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/disjoint_sets.ser" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/Classes/Graph.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/Classes/Node.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/DisjointSet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/disjoint_sets.ser" beforeDir="false" afterPath="$PROJECT_DIR$/disjoint_sets.ser" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Business.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Business.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/Recommendation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Recommendation.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Business.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Business.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/PHT.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/PHT.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Recommendation.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Recommendation.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

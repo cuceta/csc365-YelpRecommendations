@@ -11,7 +11,10 @@ public class Recommendation {
     static HashMap<String, String> BNames = new HashMap<>();//key --> name; Value --> id
     static HT wordFrequencyTable = new HT(); //key --> word; value --> count
     static PHT businessPHT; //key --> business name; value --> business ID file name
+
+
     static HashMap<Business, String> locaHM = new HashMap<>(); //key --> Business; Value --> Location
+    static Map<Business, List<Business>> closestNeighborsMap = new HashMap<>(); //key --> Business; Value --> List of closest businesses
 
 
     // ---=== TDIDF ===---
@@ -22,7 +25,7 @@ public class Recommendation {
 
 
         // ---=== READ AND RELATE BUSINESS, BUSINESS NAME, AND BUSINESS ID ===---
-        int numofBusinesses = 0;
+        int counter = 0;
         try {
             reader = new BufferedReader(new FileReader("yelp_dataset/yelp_academic_dataset_business.json"));
             String documentLine;
@@ -36,7 +39,9 @@ public class Recommendation {
 
                 Business b = new Business(id);
                 b.setName(name);
-                locaHM.put(b, loca);
+                if (counter % 100 == 0) {
+                    locaHM.put(b, loca);
+                }
                 b.setLatitude(Double.parseDouble(latitude));
                 b.setLongitude(Double.parseDouble(longitude));
                 businessHashMap.put(id, b);
@@ -44,7 +49,7 @@ public class Recommendation {
                 if (!BNames.containsKey(name)) { //no duplicates
                     BNames.put(name, id);
                 }
-                numofBusinesses++;
+                counter++;
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -309,8 +314,7 @@ public class Recommendation {
     }
 
 
-
-
+    // ---=== Geographical Neighbors ===---
     // Method to calculate distance between two points using Haversine formula
     private static double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
         final int R = 6371; // Radius of the earth
@@ -328,24 +332,20 @@ public class Recommendation {
 
     // Method to find the four closest neighbors for each business
     public static Map<Business, List<Business>> findClosestNeighbors() {
-        Map<Business, List<Business>> closestNeighborsMap = new HashMap<>();
-        int counter = 0;
+        closestNeighborsMap = new HashMap<>();
 
-        // Assuming 'businessHashMap' contains all businesses
         for (Business b1 : locaHM.keySet()) {
             List<Business> closestNeighbors = new ArrayList<>();
 
-            // To avoid clustering, select every 100th business
-            if (counter % 100 == 0) {
+            // To avoid all businesses from the same location, select every 100th business
                 for (Business b2 : locaHM.keySet()) {
                     if (!b1.equals(b2)) {
                         double distance = calculateDistance(b1.getLatitude(), b1.getLongitude(),
                                 b2.getLatitude(), b2.getLongitude());
 
-                        // Add b2 to closestNeighbors if it's closer than any of the existing neighbors
                         if (closestNeighbors.size() < 4) {
                             closestNeighbors.add(b2);
-                        } else {
+                        } else {    // Add b2 to closestNeighbors if it's closer than any of the existing neighbors
                             for (int i = 0; i < 4; i++) {
                                 if (distance < calculateDistance(b1.getLatitude(), b1.getLongitude(),
                                         closestNeighbors.get(i).getLatitude(), closestNeighbors.get(i).getLongitude())) {
@@ -357,45 +357,93 @@ public class Recommendation {
                     }
                 }
 
+                // -+-TEST-+-
                 closestNeighborsMap.put(b1, closestNeighbors);
+//                b1.setClosestNeighbors(closestNeighborsMap.get(b1)); //save the neighbors in each business
+//                System.out.println("Closest geographical businesses to: " + b1.getName() + "at: " + b1.getLatitude() + ", " + b1.getLongitude());
+//                System.out.println("    -" + b1.getClosestNeighbors().get(0));
+//                System.out.println("    -" + b1.getClosestNeighbors().get(1));
+//                System.out.println("    -" + b1.getClosestNeighbors().get(2));
+//                System.out.println("    -" + b1.getClosestNeighbors().get(3));
+
             }
 
-            counter++;
-        }
+
 
         return closestNeighborsMap;
     }
 
 
+    // ---=== Disjoint Sets ===---
+    public static void processDisjointSets(Map<Business, List<Business>> closestNeighborsMap) {
+        // Initialize Disjoint Set
+        DisjointSet disjointSet = new DisjointSet();
+
+        // Make sets for all businesses
+        for (Business business : locaHM.keySet()) {
+            disjointSet.makeSet(business);
+        }
+
+        // Find disjoint sets from geographical neighbors
+        for (Map.Entry<Business, List<Business>> entry : closestNeighborsMap.entrySet()) {
+            Business root = disjointSet.find(entry.getKey());
+            for (Business neighbor : entry.getValue()) {
+                disjointSet.union(root, neighbor);
+            }
+        }
+
+        // Count Disjoint Sets
+        Set<Business> roots = new HashSet<>();
+        for (Business business : locaHM.keySet()) {
+            roots.add(disjointSet.find(business));
+        }
+        int numberOfDisjointSets = roots.size();
+        System.out.println("Number of disjoint sets: " + numberOfDisjointSets);
+
+        // Persistently Store Disjoint Sets
+        try {
+            disjointSet.storeDisjointSetsToFile("disjoint_sets.ser");
+            System.out.println("Disjoint sets stored successfully.");
+        } catch (IOException e) {
+            System.err.println("Error while storing disjoint sets: " + e.getMessage());
+        }
+    }
+
+
     public static void main(String[] args) throws IOException, ClassNotFoundException {
-        String input = "Westshore Pizza";
-        TFIDF(input);
-//        int clusterCount = 0;
-//        for (Business b : businessHashMap.values()){
-//            System.out.println(b.toString());
-//            if (b.getCluster() == 0){
-//                clusterCount++;
-//            }
-//            System.out.println(b);
-//        }
+//        String input = "Westshore Pizza";
+//        TFIDF(input);
+
+        // ---=== test storing latitude and longitude
 //        for(Business b : locaHM.keySet()){
 //            System.out.println(b.getBusinessID() + " , " + b.getLatitude() + " , " + b.getLongitude());
 //        }
-//        System.out.println(businessHashMap.size());
-//        System.out.println(clusterCount);
 
-        Map<Business, List<Business>> closestNeighborsMap = findClosestNeighbors();
+
+        // ---=== Test Geographical Neighbors ===---
+        closestNeighborsMap = findClosestNeighbors(); //NEEDED for the neighbors to be saved. If you dont have it the findClosestNeighbors is never called
 
         for (Map.Entry<Business, List<Business>> entry : closestNeighborsMap.entrySet()) {
+
             Business business = entry.getKey();
             List<Business> closestNeighbors = entry.getValue();
 
+            business.setClosestNeighbors(closestNeighbors);
             System.out.println("Closest geographical businesses to: " + business.getName() + "at: " + business.getLatitude() + ", " + business.getLongitude());
-            for (Business neighbor : closestNeighbors) {
-                System.out.println("  - " + neighbor.getName() + "at: " + business.getLatitude() + ", " + business.getLongitude());
+            for (Business b : business.getClosestNeighbors()){
+                System.out.println("  - " + b.getName() + "at: " + b.getLatitude() + ", " + b.getLongitude());
             }
             System.out.println();
         }
+
+        System.out.println(closestNeighborsMap.size());
+
+
+
+
+        // ---=== Test Disjoint Sets ===---
+        processDisjointSets(closestNeighborsMap);
+
     }
 
 
