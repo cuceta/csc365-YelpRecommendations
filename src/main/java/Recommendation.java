@@ -19,8 +19,8 @@ public class Recommendation {
     static Map<Business, List<Business>> closestNeighborsMap = new HashMap<>(); //key --> Business; Value --> List of closest businesses
 
     //For GUI
-    public static HashMap<String, Business> getNameToBusiness(){
-        for(String name : BNames.keySet()){
+    public static HashMap<String, Business> getNameToBusiness() {
+        for (String name : BNames.keySet()) {
             String id = BNames.get(name);
             Business b = businessHashMap.get(id);
             nameTobusinessHashMap.put(name, b);
@@ -437,20 +437,15 @@ public class Recommendation {
     }
 
 
-
-    public static String findPath(Business b1, Business b2){
+    public static String findPath(Business b1, Business b2) {
         String next = " ---> ";
         String path = b1.getName() + next;
-
-
-
         DisjointSet disjointSet = new DisjointSet();
 
         // Make sets for all businesses in locaHM
         for (Business business : locaHM.keySet()) {
             disjointSet.makeSet(business);
         }
-
         // Find disjoint sets from geographical neighbors
         for (Map.Entry<Business, List<Business>> entry : closestNeighborsMap.entrySet()) {
             Business root = disjointSet.find(entry.getKey());
@@ -458,36 +453,29 @@ public class Recommendation {
                 disjointSet.union(root, neighbor);
             }
         }
-
         Set<Business> roots = new HashSet<>();
         for (Business business : locaHM.keySet()) {
             roots.add(disjointSet.find(business));
         }
-
-//        Business b1Parent = disjointSet.getParent(b1);
-//        Business b2Parent = disjointSet.getParent(b2);
-
-
-        for (Business b : roots){ //goes through the roots
-
+        for (Business b : roots) { //goes through the roots
             Set<Business> setOfMembers = disjointSet.getSetMembers(b);
             Set<String> setOfMembersNames = new HashSet<>();
-
-            for( Business business : setOfMembers){
+            for (Business business : setOfMembers) {
                 String name = business.getName();
                 setOfMembersNames.add(name);
             }
-
-//            Iterator<String> iterator = setOfMembersNames.iterator();
-
+            ArrayList<String> listOfNames = new ArrayList<>();
             //if the parent root of b1 and b2 are the same business (b)
-            if ( (setOfMembersNames.contains(b2.getName())) && setOfMembersNames.contains(b1.getName()) ){ //you're in the set of the wanted businesses
-//                for (Business bu : setOfMembers) { //goes through the businesses that are members of that root
-                    for(String name : setOfMembersNames) {
-                        //make your path
-                        System.out.println("        " + name);
-                    }
-//                }
+            if ((setOfMembersNames.contains(b2.getName())) && setOfMembersNames.contains(b1.getName())) { //you're in the set of the wanted businesses
+                for (String name : setOfMembersNames) {
+                    listOfNames.add(name);
+                }
+                int b1Position = listOfNames.indexOf(b1.getName());
+                int b2Position = listOfNames.indexOf(b2.getName());
+                for (int i = b1Position +1; i < b2Position; i++) {
+                    //make your path
+                    path = path + listOfNames.get(i) + next;
+                }
             }
         }
 
@@ -495,10 +483,6 @@ public class Recommendation {
         path = path.substring(0, (path.length() - 5)); //get rid of extra pointing arrow
         return path;
     }
-
-
-
-
 
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
@@ -534,8 +518,8 @@ public class Recommendation {
         processDisjointSets(closestNeighborsMap);
 
 
-        String business1Name = "D S Vespers Sports Pub and Eatery";
-        String business2Name = "Mojo Tapas";
+        String business1Name = "Bardelli's Pizzeria Restaurant";
+        String business2Name = "Nitza's Pizza";
 
         HashMap<String, Business> nameToBusinessHM = getNameToBusiness();
         Business business1 = nameToBusinessHM.get(business1Name);
@@ -543,7 +527,7 @@ public class Recommendation {
 //        System.out.println(business1);
 //        System.out.println(business2);
 
-        System.out.println(findPath(business1,business2));
+        System.out.println(findPath(business1, business2));
     }
 
 

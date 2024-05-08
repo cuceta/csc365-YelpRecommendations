@@ -1,102 +1,118 @@
+/* Java Program to Implement Dijkstra's Algorithm
+ * https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-in-java-using-priorityqueue/
+ * Priority Queue
+ */
+
 import java.util.*;
-
 public class Graph {
-    private Map<Business, Map<Business, Double>> adjacencyMap;
 
-    public Graph(String businessesDirectory) {
-        adjacencyMap = new HashMap<>();
-        // Load businesses from the directory and create the graph
-        loadBusinesses(businessesDirectory);
-        // Calculate TFIDF weights for edges
-        calculateTFIDFWeights();
+    // Member variables of this class
+    int[] dist;
+    private Set<Integer> settled;
+    private PriorityQueue<Node> pq;
+
+    // Number of vertices
+    private int vertices;
+    List<List<Node> > adj;
+
+    // Constructor of this class
+    public Graph(int V) {
+        // This keyword refers to current object itself
+        this.vertices = V;
+        dist = new int[V];
+        settled = new HashSet<Integer>();
+        pq = new PriorityQueue<Node>(V, new Node());
     }
 
-    private void loadBusinesses(String directory) {
-        // Load businesses from the directory and add them to the graph
-        Map<String, Business> businesses = Recommendation.getNameToBusiness();
-        for (Business business : businesses.values()) {
-            adjacencyMap.put(business, new HashMap<>());
+    // Dijkstra's Algorithm
+    public void dijkstra(List<List<Node> > adj, int src)
+    {
+        this.adj = adj;
+
+        for (int i = 0; i < vertices; i++)
+            dist[i] = Integer.MAX_VALUE;
+
+        pq.add(new Node(src, 0));
+        dist[src] = 0;
+
+        while (settled.size() != vertices) {
+
+            if (pq.isEmpty())
+                return;
+
+            int u = pq.remove().node;
+
+            if (settled.contains(u))
+                continue;
+            settled.add(u);
+
+            e_Neighbours(u);
         }
     }
 
-    private void calculateTFIDFWeights() {
-        // Calculate TFIDF weights for edges based on cosine similarity between businesses
-        for (Business business1 : adjacencyMap.keySet()) {
-            for (Business business2 : adjacencyMap.keySet()) {
-                if (!business1.equals(business2)) {
-                    double similarity = calculateCosineSimilarity(business1, business2);
-                    adjacencyMap.get(business1).put(business2, similarity);
-                }
+    // Method 2
+    // To process all the neighbours
+    // of the passed node
+    private void e_Neighbours(int u)
+    {
+
+        int edgeDistance = -1;
+        int newDistance = -1;
+
+        // All the neighbors of v
+        for (int i = 0; i < adj.get(u).size(); i++) {
+            Node v = adj.get(u).get(i);
+
+            // If current node hasn't already been processed
+            if (!settled.contains(v.node)) {
+                edgeDistance = v.cost;
+                newDistance = dist[u] + edgeDistance;
+
+                // If new distance is cheaper in cost
+                if (newDistance < dist[v.node])
+                    dist[v.node] = newDistance;
+                pq.add(new Node(v.node, dist[v.node]));
             }
         }
     }
 
-    private double calculateCosineSimilarity(Business business1, Business business2) {
-        HT tfidf1 = business1.getTFIDF();
-        HT tfidf2 = business2.getTFIDF();
+    // Main driver method
+    public static void main(String arg[])
+    {
+        int V = 5;
+        int source = 0;
 
-        double dotProduct = 0.0;
-        double magnitude1 = 0.0;
-        double magnitude2 = 0.0;
+        // Adjacency list representation of the
+        // connected edges by declaring List class object
+        // Declaring object of type List<Node>
+        List<List<Node> > adj
+                = new ArrayList<List<Node> >();
 
-        // Calculate dot product and magnitudes
-        for (String term : tfidf1.getKeySet()) {
-            double value1 = tfidf1.value(term);
-            double value2 = tfidf2.value(term);
-            dotProduct += value1 * value2;
-            magnitude1 += Math.pow(value1, 2);
+        // Initialize list for every node
+        for (int i = 0; i < V; i++) {
+            List<Node> item = new ArrayList<Node>();
+            adj.add(item);
         }
 
-        for (String term : tfidf2.getKeySet()) {
-            magnitude2 += Math.pow(tfidf2.value(term), 2);
-        }
+        // Inputs for the GFG(dpq) graph
+        adj.get(0).add(new Node(1, 9));
+        adj.get(0).add(new Node(2, 6));
+        adj.get(0).add(new Node(3, 5));
+        adj.get(0).add(new Node(4, 3));
 
-        // Calculate cosine similarity
-        if (magnitude1 == 0 || magnitude2 == 0) {
-            return 0.0; // Handle division by zero
-        }
-        return dotProduct / (Math.sqrt(magnitude1) * Math.sqrt(magnitude2));
+        adj.get(2).add(new Node(1, 2));
+        adj.get(2).add(new Node(3, 4));
+
+        // Calculating the single source shortest path
+        Graph dpq = new Graph(V);
+        dpq.dijkstra(adj, source);
+
+        // Printing the shortest path to all the nodes
+        // from the source node
+        System.out.println("The shorted path from node :");
+
+        for (int i = 0; i < dpq.dist.length; i++)
+            System.out.println(source + " to " + i + " is "
+                    + dpq.dist[i]);
     }
-
-    public List<Business> findShortestPath(Business start, Business end) {
-        // Find the shortest path between two businesses using Dijkstra's algorithm
-        Map<Business, Double> distance = new HashMap<>();
-        Map<Business, Business> previous = new HashMap<>();
-        PriorityQueue<Business> queue = new PriorityQueue<>(Comparator.comparingDouble(distance::get));
-
-        // Initialization
-        for (Business business : adjacencyMap.keySet()) {
-            distance.put(business, Double.MAX_VALUE);
-            previous.put(business, null);
-        }
-        distance.put(start, 0.0);
-        queue.add(start);
-
-        // Dijkstra's algorithm
-        while (!queue.isEmpty()) {
-            Business current = queue.poll();
-            if (current.equals(end)) {
-                break;
-            }
-            for (Business neighbor : adjacencyMap.get(current).keySet()) {
-                double alt = distance.get(current) + adjacencyMap.get(current).get(neighbor);
-                if (alt < distance.get(neighbor)) {
-                    distance.put(neighbor, alt);
-                    previous.put(neighbor, current);
-                    queue.add(neighbor);
-                }
-            }
-        }
-
-        // Reconstruct the shortest path
-        List<Business> path = new ArrayList<>();
-        Business current = end;
-        while (current != null) {
-            path.add(current);
-            current = previous.get(current);
-        }
-        Collections.reverse(path);
-        return path;
-    }
-
 }

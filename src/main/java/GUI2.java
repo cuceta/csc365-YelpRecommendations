@@ -136,18 +136,19 @@ public class GUI2 {
             return;
         }
 
-        List<Business> path = graphUtil.findPath(business1, business2);
+//        List<Business> path = graphUtil.findPath(business1, business2);
         String message;
-//        if (path.isEmpty()) {
-//            message = "No path exists between " + business1Name + " and " + business2Name;
-//        } else {
-            StringBuilder pathStringBuilder = new StringBuilder("Path: ");
-            for (Business business : path) {
-                pathStringBuilder.append(business.getName()).append(" -> ");
-            }
-            pathStringBuilder.delete(pathStringBuilder.length() - 4, pathStringBuilder.length());
-            message = pathStringBuilder.toString();
-//        }
+////        if (path.isEmpty()) {
+////            message = "No path exists between " + business1Name + " and " + business2Name;
+////        } else {
+//            StringBuilder pathStringBuilder = new StringBuilder("Path: ");
+//            for (Business business : path) {
+//                pathStringBuilder.append(business.getName()).append(" -> ");
+//            }
+//            pathStringBuilder.delete(pathStringBuilder.length() - 4, pathStringBuilder.length());
+//            message = pathStringBuilder.toString();
+////        }
+        message = Recommendation.findPath(business1,business2);
 
         JLabel pathLabel = new JLabel(message);
         results.removeAll();
