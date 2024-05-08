@@ -411,8 +411,8 @@ public class Recommendation {
 
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
-//        String input = "Westshore Pizza";
-//        TFIDF(input);
+        String input = "Westshore Pizza";
+        TFIDF(input);
 
         // ---=== test storing latitude and longitude
 //        for(Business b : locaHM.keySet()){
