@@ -8,14 +8,35 @@ public class Recommendation {
 
     static HashMap<String, String> bNamesHashMap = new HashMap<>(); //key --> id; value --> Businesses names
     static HashMap<String, Business> businessHashMap = new HashMap<String, Business>(); //key --> id; value -->business
+    static HashMap<String, Business> businessHashMap2 = new HashMap<String, Business>(); //key --> id; value -->business
     static HashMap<String, String> BNames = new HashMap<>();//key --> name; Value --> id
     static HT wordFrequencyTable = new HT(); //key --> word; value --> count
     static PHT businessPHT; //key --> business name; value --> business ID file name
-
-
     static HashMap<Business, String> locaHM = new HashMap<>(); //key --> Business; Value --> Location
     static Map<Business, List<Business>> closestNeighborsMap = new HashMap<>(); //key --> Business; Value --> List of closest businesses
 
+    //For GUI
+    public static HashMap<String, Business> getNameToBusiness(){
+        Gson gson = new Gson();
+        BufferedReader reader;
+        JsonObject[] businessData = new JsonObject[150345], businessReview = new JsonObject[6990280];
+
+
+        // ---=== READ AND RELATE BUSINESS NAME AND BUSINESS OBJECT ===---
+        try {
+            reader = new BufferedReader(new FileReader("yelp_dataset/yelp_academic_dataset_business.json"));
+            String documentLine;
+            while ((documentLine = reader.readLine()) != null) {
+                JsonObject business = gson.fromJson(documentLine, JsonObject.class);
+                String id = String.valueOf(business.get("business_id")).substring(1, 23);
+                String name = String.join(" ", String.valueOf(business.get("name")).split("[^a-zA-Z0-9'&-]+")).substring(1);
+                businessHashMap2.put(name, new Business(id));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return businessHashMap2;
+    }
 
     // ---=== TDIDF ===---
     public static HashMap<String, Business> TFIDF(String input) throws IOException, ClassNotFoundException {
@@ -205,14 +226,10 @@ public class Recommendation {
 
         // Get top similar businesses
         int mostSimilar = 3; // Change this value to get more top businesses
-//        System.out.println("Top " + mostSimilar + " similar businesses to " + userBusiness.getName() + ":");
         for (int i = 0; i < Math.min(mostSimilar, sortedResults.size()); i++) {
             Map.Entry<String, Double> reslt = sortedResults.get(i);
             String name = bNamesHashMap.get(businessHashMap.get(reslt.getKey()).getBusinessID());
-//            double similarityResult = reslt.getValue();
             nameToResult.put(businessHashMap.get(reslt.getKey()).getBusinessID(), businessHashMap.get(BNames.get(name)));
-//            System.out.println(name + ": " + similarityResult + ";       Cluster: " + businessHashMap.get(reslt.getKey()).getCluster());
-//            System.out.println(businessHashMap.get(businessHashMap.get(reslt.getKey()).getBusinessID()).getReview());
         }
         makeClusters();
         return nameToResult;
@@ -338,27 +355,27 @@ public class Recommendation {
             List<Business> closestNeighbors = new ArrayList<>();
 
             // To avoid all businesses from the same location, select every 100th business
-                for (Business b2 : locaHM.keySet()) {
-                    if (!b1.equals(b2)) {
-                        double distance = calculateDistance(b1.getLatitude(), b1.getLongitude(),
-                                b2.getLatitude(), b2.getLongitude());
+            for (Business b2 : locaHM.keySet()) {
+                if (!b1.equals(b2)) {
+                    double distance = calculateDistance(b1.getLatitude(), b1.getLongitude(),
+                            b2.getLatitude(), b2.getLongitude());
 
-                        if (closestNeighbors.size() < 4) {
-                            closestNeighbors.add(b2);
-                        } else {    // Add b2 to closestNeighbors if it's closer than any of the existing neighbors
-                            for (int i = 0; i < 4; i++) {
-                                if (distance < calculateDistance(b1.getLatitude(), b1.getLongitude(),
-                                        closestNeighbors.get(i).getLatitude(), closestNeighbors.get(i).getLongitude())) {
-                                    closestNeighbors.set(i, b2);
-                                    break;
-                                }
+                    if (closestNeighbors.size() < 4) {
+                        closestNeighbors.add(b2);
+                    } else {    // Add b2 to closestNeighbors if it's closer than any of the existing neighbors
+                        for (int i = 0; i < 4; i++) {
+                            if (distance < calculateDistance(b1.getLatitude(), b1.getLongitude(),
+                                    closestNeighbors.get(i).getLatitude(), closestNeighbors.get(i).getLongitude())) {
+                                closestNeighbors.set(i, b2);
+                                break;
                             }
                         }
                     }
                 }
+            }
 
-                // -+-TEST-+-
-                closestNeighborsMap.put(b1, closestNeighbors);
+            // -+-TEST-+-
+            closestNeighborsMap.put(b1, closestNeighbors);
 //                b1.setClosestNeighbors(closestNeighborsMap.get(b1)); //save the neighbors in each business
 //                System.out.println("Closest geographical businesses to: " + b1.getName() + "at: " + b1.getLatitude() + ", " + b1.getLongitude());
 //                System.out.println("    -" + b1.getClosestNeighbors().get(0));
@@ -366,8 +383,7 @@ public class Recommendation {
 //                System.out.println("    -" + b1.getClosestNeighbors().get(2));
 //                System.out.println("    -" + b1.getClosestNeighbors().get(3));
 
-            }
-
+        }
 
 
         return closestNeighborsMap;
@@ -379,7 +395,7 @@ public class Recommendation {
         // Initialize Disjoint Set
         DisjointSet disjointSet = new DisjointSet();
 
-        // Make sets for all businesses
+        // Make sets for all businesses in locaHM
         for (Business business : locaHM.keySet()) {
             disjointSet.makeSet(business);
         }
@@ -402,7 +418,7 @@ public class Recommendation {
 
         // Persistently Store Disjoint Sets
         try {
-            disjointSet.storeDisjointSetsToFile("disjoint_sets.ser");
+            DisjointSet.serialize(disjointSet, "disjoint_sets.ser");
             System.out.println("Disjoint sets stored successfully.");
         } catch (IOException e) {
             System.err.println("Error while storing disjoint sets: " + e.getMessage());
@@ -430,15 +446,13 @@ public class Recommendation {
 
             business.setClosestNeighbors(closestNeighbors);
             System.out.println("Closest geographical businesses to: " + business.getName() + "at: " + business.getLatitude() + ", " + business.getLongitude());
-            for (Business b : business.getClosestNeighbors()){
+            for (Business b : business.getClosestNeighbors()) {
                 System.out.println("  - " + b.getName() + "at: " + b.getLatitude() + ", " + b.getLongitude());
             }
             System.out.println();
         }
 
         System.out.println(closestNeighborsMap.size());
-
-
 
 
         // ---=== Test Disjoint Sets ===---

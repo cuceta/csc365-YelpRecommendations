@@ -1,138 +1,127 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.IOException;
-import java.util.HashMap;
+import java.io.*;
+import java.util.*;
+import java.util.List;
 
 public class GUI2 {
     private JFrame frame;
-    private JButton submitButton;
-    private JButton closeButton;
-    private JPanel container;
-    private JPanel top;
-    private JPanel results;
+    private JButton closeButton, findPathButton;
+    private JPanel container, top, results, setsPanel;
     private JLabel info;
-    private JTextField input;
+    private JTextField inputBusiness1, inputBusiness2;
 
-    private String storedInput;
-
-    // Place Holder
-    private JPanel recOne;
-    private JPanel recTwo;
-    private JLabel text1;
-    private JLabel text2;
-    private JLabel categoryLabel;
-    private JLabel similarKeyLabel;
+    private DisjointSet disjointSet;
 
     public GUI2() {
-        frame = new JFrame();
+        frame = new JFrame("YELP Business Recommendations");
         container = new JPanel();
         results = new JPanel(new GridLayout(1, 2));
-        results.setBackground(Color.BLACK);
-        recOne = new JPanel(new FlowLayout());
-        recTwo = new JPanel(new FlowLayout());
+        setsPanel = new JPanel();
         top = new JPanel(new FlowLayout());
 
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
-        text1 = new JLabel("Recommendation\n");
-        text2 = new JLabel("Recommendation\n");
-        categoryLabel = new JLabel();
-        similarKeyLabel = new JLabel();
 
-        submitButton = new JButton("Submit");
         closeButton = new JButton("Close");
-        info = new JLabel("Enter the business ID of businesses you love and we'll give you some recommendations!");
-        input = new JTextField(24);
+        findPathButton = new JButton("Find Path");
+
+        info = new JLabel("Enter business IDs for pathfinding:");
+        inputBusiness1 = new JTextField(15);
+        inputBusiness2 = new JTextField(15);
 
         setUpGUI();
-        setCloseButton();
-        storeString();
+        setActions();
+        loadDisjointSets(); // Load and display sets at the start
     }
 
-    public void setUpGUI() {
-        frame.setSize(1400, 200);
-        frame.setTitle("YELP Business Recommendations");
-        frame.setBackground(Color.MAGENTA);
-        top.add(info);
-        top.add(input);
-        top.add(submitButton);
-        top.add(closeButton);
+    private void setUpGUI() {
+        frame.setSize(1500, 800);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        recOne.add(text1);
-        recTwo.add(text2);
-        results.add(recOne);
-        results.add(recTwo);
+        top.add(info);
+        top.add(inputBusiness1);
+        top.add(inputBusiness2);
+        top.add(findPathButton);
+        top.add(closeButton);
 
         container.add(top);
         container.add(results);
-        container.add(categoryLabel);
-        container.add(similarKeyLabel);
+        container.add(new JScrollPane(setsPanel)); // Ensure setsPanel is scrollable
+
         frame.add(container);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
 
-    public void storeString() {
-        ActionListener submitRequest = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                storedInput = input.getText();
-
-                HashMap<String, Business> results = null;
-                try {
-                    results = Recommendation.TFIDF(storedInput);
-                } catch (IOException | ClassNotFoundException ex) {
-                    throw new RuntimeException(ex);
-                }
-
-                updateRecs(results);
-            }
-        };
-        submitButton.addActionListener(submitRequest);
+    private void setActions() {
+        closeButton.addActionListener(e -> frame.setVisible(false));
+        findPathButton.addActionListener(e -> findShortestPath());
     }
 
-    private void updateRecs(HashMap<String, Business> recommendations) {
-        JLabel rec1 = new JLabel();
-        JLabel rec2 = new JLabel();
-        int i = 0;
-        for (String id : recommendations.keySet()) {
-            if (recommendations.get(id).getCosineSimilarity() <= 0.9) {
-                if (i == 0) {
-                    rec1.setText("\n[" + recommendations.get(id).getName() + ": Similarity --> " + recommendations.get(id).getCosineSimilarity() + "]\n");
-                } else if (i == 1) {
-                    rec2.setText("\n[" + recommendations.get(id).getName() + ": Similarity --> " + recommendations.get(id).getCosineSimilarity() + "]\n");
-                    break; // We only need top two recommendations
-                }
-                i++;
+    private void loadDisjointSets() {
+        try {
+            disjointSet = DisjointSet.deserialize("disjoint_sets.ser");
+            displayDisjointSets();
+        } catch (IOException | ClassNotFoundException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "Failed to load disjoint sets: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+
+    private void displayDisjointSets() {
+        setsPanel.setLayout(new BoxLayout(setsPanel, BoxLayout.Y_AXIS)); // Use vertical layout
+        Set<Business> roots = disjointSet.getAllRoots();
+        setsPanel.removeAll();
+        for (Business root : roots) {
+            Set<Business> members = disjointSet.getSetMembers(root);
+            JTextArea setDisplay = new JTextArea(2, 20);
+            setDisplay.setText("Set Root: " + root.getName() + " includes: \n");
+            for (Business member : members) {
+                setDisplay.append(member.getName() + ", ");
             }
+            setDisplay.setEditable(false);
+            setsPanel.add(setDisplay);
+        }
+        setsPanel.revalidate();
+        setsPanel.repaint();
+    }
+
+    private void findShortestPath() {
+        String business1Name = inputBusiness1.getText().trim();
+        String business2Name = inputBusiness2.getText().trim();
+
+        HashMap<String, Business> businessMap = Recommendation.getNameToBusiness();
+
+        // Assuming businessMap maps business names to Business objects
+        Business business1 = businessMap.get(business1Name);
+        Business business2 = businessMap.get(business2Name);
+
+        if (business1 == null || business2 == null) {
+            JOptionPane.showMessageDialog(frame, "One or both business names are invalid.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
 
-        // Add recommendations to the panels
-        recOne.add(rec1);
-        recTwo.add(rec2);
+        // Assuming disjointSet is an instance of DisjointSet and is properly initialized
+        Business root1 = disjointSet.find(business1);
+        Business root2 = disjointSet.find(business2);
 
-        // Display category and similar key
-        Business firstBusiness = recommendations.values().iterator().next();
-        recommendations.remove(firstBusiness.getBusinessID());
-        Business second = recommendations.values().iterator().next();
-        categoryLabel.setText(firstBusiness.getName() +" is in cluster: " + firstBusiness.getCluster());
-        similarKeyLabel.setText("Similar Key: " + second.getName());
+        // Check if both businesses share the same root in the disjoint set
+        boolean isConnected = root1.equals(root2);
 
-        frame.revalidate();
-        frame.repaint();
+        // Display the result
+        String message = isConnected ? "A path exists between " + business1Name + " and " + business2Name
+                : "No path exists between " + business1Name + " and " + business2Name;
+
+        JLabel pathLabel = new JLabel(message);
+        results.removeAll();
+        results.add(pathLabel);
+        results.revalidate();
+        results.repaint();
     }
 
-    public void setCloseButton() {
-        ActionListener closeGUI = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                frame.setVisible(false);
-            }
-        };
-        closeButton.addActionListener(closeGUI);
-    }
 
     public static void main(String[] args) {
-        GUI2 gui = new GUI2();
+        new GUI2();
     }
 }

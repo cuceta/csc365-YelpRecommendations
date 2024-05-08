@@ -1,7 +1,8 @@
 import java.io.*;
 import java.util.*;
 
-public class DisjointSet {
+public class DisjointSet implements Serializable {
+    private static final long serialVersionUID = 1L; // Add serialization ID
     private Map<Business, Business> parent;
     private Map<Business, Integer> rank;
 
@@ -10,21 +11,18 @@ public class DisjointSet {
         rank = new HashMap<>();
     }
 
-    // Create a new set with a single element
     public void makeSet(Business business) {
         parent.put(business, business);
         rank.put(business, 0);
     }
 
-    // Find the root of the set to which the element belongs
     public Business find(Business business) {
         if (business != parent.get(business)) {
-            parent.put(business, find(parent.get(business))); // Path compression
+            parent.put(business, find(parent.get(business)));
         }
         return parent.get(business);
     }
 
-    // Merge two sets into one
     public void union(Business x, Business y) {
         Business xRoot = find(x);
         Business yRoot = find(y);
@@ -41,26 +39,33 @@ public class DisjointSet {
         }
     }
 
-    // Count the number of disjoint sets
-    public int countDisjointSets() {
+    public Set<Business> getAllRoots() {
         Set<Business> roots = new HashSet<>();
         for (Business business : parent.keySet()) {
             roots.add(find(business));
         }
-        return roots.size();
+        return roots;
     }
 
-    // Persistently store disjoint sets to a file
-    public void storeDisjointSetsToFile(String filename) throws IOException {
-        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(filename))) {
-            outputStream.writeObject(parent);
+    public Set<Business> getSetMembers(Business root) {
+        Set<Business> members = new HashSet<>();
+        for (Business business : parent.keySet()) {
+            if (find(business).equals(root)) {
+                members.add(business);
+            }
+        }
+        return members;
+    }
+
+    public static void serialize(DisjointSet set, String filename) throws IOException {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
+            out.writeObject(set);
         }
     }
 
-    // Load disjoint sets from a file
-    public void loadDisjointSetsFromFile(String filename) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(filename))) {
-            parent = (Map<Business, Business>) inputStream.readObject();
+    public static DisjointSet deserialize(String filename) throws IOException, ClassNotFoundException {
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))) {
+            return (DisjointSet) in.readObject();
         }
     }
 }

@@ -4,7 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f0ed166-6e77-4721-97bd-2def3faa0be1" name="Changes" comment="" />
+    <list default="true" id="6f0ed166-6e77-4721-97bd-2def3faa0be1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/disjoint_sets.ser" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Business.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Business.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Classes/Graph.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Classes/Graph.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/DisjointSet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/DisjointSet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/GUI2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/GUI2.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Recommendation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Recommendation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Classes/Graph.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Classes/Graph.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/DisjointSet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/DisjointSet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/GUI2$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/GUI2$2.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/GUI2.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/GUI2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Recommendation.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Recommendation.class" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -50,7 +64,14 @@
     "last_opened_file_path": "/Users/uceta/Documents/GitHub/csc365-YelpRecommendations"
   }
 }]]></component>
-  <component name="RunManager" selected="Application.Recommendation">
+  <component name="RunManager" selected="Application.GUI2">
+    <configuration name="GUI2" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="GUI2" />
+      <module name="Project1" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Graph" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Classes.Graph" />
       <module name="Project1" />
@@ -73,6 +94,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.GUI2" />
         <item itemvalue="Application.Recommendation" />
         <item itemvalue="Application.Graph" />
       </list>
