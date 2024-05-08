@@ -89,10 +89,17 @@ public class GUI2 {
         setsPanel.removeAll();
         for (Business root : roots) {
             Set<Business> members = disjointSet.getSetMembers(root);
+            Set<String> membersName = new HashSet<>();
             JTextArea setDisplay = new JTextArea(2, 20);
             setDisplay.setText("Set Root: " + root.getName() + " includes: \n");
-            for (Business member : members) {
-                setDisplay.append(member.getName() + ", ");
+
+            for(Business business : members){
+                String name = business.getName();
+                membersName.add(name);
+            }
+
+            for (String businessName : membersName) {
+                setDisplay.append(businessName + ", ");
             }
             setDisplay.setEditable(false);
             setsPanel.add(setDisplay);
