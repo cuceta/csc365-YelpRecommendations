@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.*;
 
 public class DisjointSet implements Serializable {
-    private static final long serialVersionUID = 1L; // Add serialization ID
+    private static final long serialVersionUID = 1L;
     private Map<Business, Business> parent;
     private Map<Business, Integer> rank;
 
@@ -18,7 +18,7 @@ public class DisjointSet implements Serializable {
 
     public Business find(Business business) {
         if (business != parent.get(business)) {
-            parent.put(business, find(parent.get(business)));
+            parent.put(business, find(parent.get(business))); // Path compression
         }
         return parent.get(business);
     }
@@ -27,8 +27,9 @@ public class DisjointSet implements Serializable {
         Business xRoot = find(x);
         Business yRoot = find(y);
 
-        if (xRoot == yRoot) return;
+        if (xRoot == yRoot) return; // Already in the same set
 
+        // Union by rank
         if (rank.get(xRoot) < rank.get(yRoot)) {
             parent.put(xRoot, yRoot);
         } else if (rank.get(xRoot) > rank.get(yRoot)) {
@@ -37,6 +38,11 @@ public class DisjointSet implements Serializable {
             parent.put(yRoot, xRoot);
             rank.put(xRoot, rank.get(xRoot) + 1);
         }
+    }
+
+    // Check if two businesses are in the same component
+    public boolean isSameComponent(Business a, Business b) {
+        return find(a) == find(b);
     }
 
     public Set<Business> getAllRoots() {
@@ -67,5 +73,9 @@ public class DisjointSet implements Serializable {
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))) {
             return (DisjointSet) in.readObject();
         }
+    }
+
+    public Business getParent(Business business) {
+        return parent.get(business);
     }
 }

@@ -99,4 +99,8 @@ public class Business implements Serializable {
                 ", longitude=" + longitude +
                 '}';
     }
+
+    public boolean busineesEquals(Business b){
+        return this.name.equals(b.getName());
+    }
 }

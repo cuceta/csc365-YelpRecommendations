@@ -7,35 +7,25 @@ import java.util.*;
 public class Recommendation {
 
     static HashMap<String, String> bNamesHashMap = new HashMap<>(); //key --> id; value --> Businesses names
-    static HashMap<String, Business> businessHashMap = new HashMap<String, Business>(); //key --> id; value -->business
-    static HashMap<String, Business> businessHashMap2 = new HashMap<String, Business>(); //key --> id; value -->business
+    static HashMap<String, Business> businessHashMap = new HashMap<>(); //key --> id; value --> business
+    static HashMap<String, Business> nameTobusinessHashMap = new HashMap<>(); //key --> name; value --> business
     static HashMap<String, String> BNames = new HashMap<>();//key --> name; Value --> id
     static HT wordFrequencyTable = new HT(); //key --> word; value --> count
     static PHT businessPHT; //key --> business name; value --> business ID file name
     static HashMap<Business, String> locaHM = new HashMap<>(); //key --> Business; Value --> Location
+    static HashMap<String, String> nameToLocationHM = new HashMap<>(); //key --> name; Value --> Location
+
+
     static Map<Business, List<Business>> closestNeighborsMap = new HashMap<>(); //key --> Business; Value --> List of closest businesses
 
     //For GUI
     public static HashMap<String, Business> getNameToBusiness(){
-        Gson gson = new Gson();
-        BufferedReader reader;
-        JsonObject[] businessData = new JsonObject[150345], businessReview = new JsonObject[6990280];
-
-
-        // ---=== READ AND RELATE BUSINESS NAME AND BUSINESS OBJECT ===---
-        try {
-            reader = new BufferedReader(new FileReader("yelp_dataset/yelp_academic_dataset_business.json"));
-            String documentLine;
-            while ((documentLine = reader.readLine()) != null) {
-                JsonObject business = gson.fromJson(documentLine, JsonObject.class);
-                String id = String.valueOf(business.get("business_id")).substring(1, 23);
-                String name = String.join(" ", String.valueOf(business.get("name")).split("[^a-zA-Z0-9'&-]+")).substring(1);
-                businessHashMap2.put(name, new Business(id));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        for(String name : BNames.keySet()){
+            String id = BNames.get(name);
+            Business b = businessHashMap.get(id);
+            nameTobusinessHashMap.put(name, b);
         }
-        return businessHashMap2;
+        return nameTobusinessHashMap;
     }
 
     // ---=== TDIDF ===---
@@ -62,6 +52,9 @@ public class Recommendation {
                 b.setName(name);
                 if (counter % 100 == 0) {
                     locaHM.put(b, loca);
+                    b.setName(name);
+
+//                    nameToLocationHM.put(name, loca);
                 }
                 b.setLatitude(Double.parseDouble(latitude));
                 b.setLongitude(Double.parseDouble(longitude));
@@ -192,7 +185,8 @@ public class Recommendation {
 
 
     // ---=== COSINE VECTOR ===---
-    public static HashMap<String, Business> cosineVector(String inputID) throws IOException, ClassNotFoundException { //Cosinevector = (a * b)/( ( squart(A^2) )( squart(B^2) )
+    public static HashMap<String, Business> cosineVector(String inputID) throws IOException, ClassNotFoundException {
+        //Cosinevector = (a * b)/( ( squart(A^2) )( squart(B^2) )
         serializeBusinesses();
         Business userBusiness = businessHashMap.get(inputID);
         HashMap<String, Double> similarityResults = new HashMap<>(); //Stores key-->id; value -->cosine vector result.
@@ -392,6 +386,7 @@ public class Recommendation {
 
     // ---=== Disjoint Sets ===---
     public static void processDisjointSets(Map<Business, List<Business>> closestNeighborsMap) {
+
         // Initialize Disjoint Set
         DisjointSet disjointSet = new DisjointSet();
 
@@ -413,6 +408,12 @@ public class Recommendation {
         for (Business business : locaHM.keySet()) {
             roots.add(disjointSet.find(business));
         }
+//        for (Business b : roots){
+//            System.out.println(b);
+//            for (Business b2 : disjointSet.getSetMembers(b)){
+//                System.out.println("        " + b2);
+//            }
+//        }
         int numberOfDisjointSets = roots.size();
         System.out.println("Number of disjoint sets: " + numberOfDisjointSets);
 
@@ -424,6 +425,80 @@ public class Recommendation {
             System.err.println("Error while storing disjoint sets: " + e.getMessage());
         }
     }
+
+    public static Map<Business, List<Business>> buildAdjacencyList(Map<Business, List<Business>> closestNeighborsMap) {
+        Map<Business, List<Business>> adjacencyList = new HashMap<>();
+        // Assuming closestNeighborsMap contains each business and a list of their closest neighbors
+        for (Map.Entry<Business, List<Business>> entry : closestNeighborsMap.entrySet()) {
+            List<Business> neighbors = entry.getValue();
+            adjacencyList.put(entry.getKey(), neighbors);
+        }
+        return adjacencyList;
+    }
+
+
+
+    public static String findPath(Business b1, Business b2){
+        String next = " ---> ";
+        String path = b1.getName() + next;
+
+
+
+        DisjointSet disjointSet = new DisjointSet();
+
+        // Make sets for all businesses in locaHM
+        for (Business business : locaHM.keySet()) {
+            disjointSet.makeSet(business);
+        }
+
+        // Find disjoint sets from geographical neighbors
+        for (Map.Entry<Business, List<Business>> entry : closestNeighborsMap.entrySet()) {
+            Business root = disjointSet.find(entry.getKey());
+            for (Business neighbor : entry.getValue()) {
+                disjointSet.union(root, neighbor);
+            }
+        }
+
+        Set<Business> roots = new HashSet<>();
+        for (Business business : locaHM.keySet()) {
+            roots.add(disjointSet.find(business));
+        }
+
+//        Business b1Parent = disjointSet.getParent(b1);
+//        Business b2Parent = disjointSet.getParent(b2);
+
+
+        for (Business b : roots){ //goes through the roots
+
+            Set<Business> setOfMembers = disjointSet.getSetMembers(b);
+            Set<String> setOfMembersNames = new HashSet<>();
+
+            for( Business business : setOfMembers){
+                String name = business.getName();
+                setOfMembersNames.add(name);
+            }
+
+//            Iterator<String> iterator = setOfMembersNames.iterator();
+
+            //if the parent root of b1 and b2 are the same business (b)
+            if ( (setOfMembersNames.contains(b2.getName())) && setOfMembersNames.contains(b1.getName()) ){ //you're in the set of the wanted businesses
+//                for (Business bu : setOfMembers) { //goes through the businesses that are members of that root
+                    for(String name : setOfMembersNames) {
+                        //make your path
+                        System.out.println("        " + name);
+                    }
+//                }
+            }
+        }
+
+        path = path + b2.getName() + next;
+        path = path.substring(0, (path.length() - 5)); //get rid of extra pointing arrow
+        return path;
+    }
+
+
+
+
 
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
@@ -458,6 +533,17 @@ public class Recommendation {
         // ---=== Test Disjoint Sets ===---
         processDisjointSets(closestNeighborsMap);
 
+
+        String business1Name = "D S Vespers Sports Pub and Eatery";
+        String business2Name = "Mojo Tapas";
+
+        HashMap<String, Business> nameToBusinessHM = getNameToBusiness();
+        Business business1 = nameToBusinessHM.get(business1Name);
+        Business business2 = nameToBusinessHM.get(business2Name);
+//        System.out.println(business1);
+//        System.out.println(business2);
+
+        System.out.println(findPath(business1,business2));
     }
 
 

@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -13,6 +14,8 @@ public class GUI2 {
     private JTextField inputBusiness1, inputBusiness2;
 
     private DisjointSet disjointSet;
+    private GraphUtil graphUtil;
+
 
     public GUI2() {
         frame = new JFrame("YELP Business Recommendations");
@@ -30,9 +33,13 @@ public class GUI2 {
         inputBusiness1 = new JTextField(15);
         inputBusiness2 = new JTextField(15);
 
+        this.disjointSet = new DisjointSet();
+
+        this.graphUtil = initializeGraphUtil();
+
         setUpGUI();
         setActions();
-        loadDisjointSets(); // Load and display sets at the start
+        loadDisjointSets();
     }
 
     private void setUpGUI() {
@@ -55,7 +62,15 @@ public class GUI2 {
 
     private void setActions() {
         closeButton.addActionListener(e -> frame.setVisible(false));
-        findPathButton.addActionListener(e -> findShortestPath());
+        findPathButton.addActionListener(e -> {
+            try {
+                findShortestPath();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            } catch (ClassNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
 
     private void loadDisjointSets() {
@@ -67,7 +82,6 @@ public class GUI2 {
             JOptionPane.showMessageDialog(frame, "Failed to load disjoint sets: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-
 
     private void displayDisjointSets() {
         setsPanel.setLayout(new BoxLayout(setsPanel, BoxLayout.Y_AXIS)); // Use vertical layout
@@ -87,31 +101,46 @@ public class GUI2 {
         setsPanel.repaint();
     }
 
-    private void findShortestPath() {
-        String business1Name = inputBusiness1.getText().trim();
-        String business2Name = inputBusiness2.getText().trim();
 
-        HashMap<String, Business> businessMap = Recommendation.getNameToBusiness();
+    public GraphUtil initializeGraphUtil() {
+        Map<Business, List<Business>> adjacencyList = Recommendation.buildAdjacencyList(Recommendation.findClosestNeighbors());
+        GraphUtil graphUtil = new GraphUtil(adjacencyList, disjointSet);
+        return graphUtil;
+    }
 
-        // Assuming businessMap maps business names to Business objects
-        Business business1 = businessMap.get(business1Name);
-        Business business2 = businessMap.get(business2Name);
+    private void findShortestPath() throws IOException, ClassNotFoundException {
+        String business1Name = inputBusiness1.getText();
+        String business2Name = inputBusiness2.getText();
+
+        HashMap<String, Business> tfidf1 = Recommendation.TFIDF(business1Name);
+        HashMap<String, Business> tfidf2 = Recommendation.TFIDF(business2Name);
+
+        Map<Business, List<Business>> closestNeighborsMap = Recommendation.findClosestNeighbors();
+        Recommendation.processDisjointSets(closestNeighborsMap);
+
+
+
+        HashMap<String, Business> nameToBusinessHM = Recommendation.getNameToBusiness();
+        Business business1 = nameToBusinessHM.get(business1Name);
+        Business business2 = nameToBusinessHM.get(business2Name);
 
         if (business1 == null || business2 == null) {
             JOptionPane.showMessageDialog(frame, "One or both business names are invalid.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Assuming disjointSet is an instance of DisjointSet and is properly initialized
-        Business root1 = disjointSet.find(business1);
-        Business root2 = disjointSet.find(business2);
-
-        // Check if both businesses share the same root in the disjoint set
-        boolean isConnected = root1.equals(root2);
-
-        // Display the result
-        String message = isConnected ? "A path exists between " + business1Name + " and " + business2Name
-                : "No path exists between " + business1Name + " and " + business2Name;
+        List<Business> path = graphUtil.findPath(business1, business2);
+        String message;
+//        if (path.isEmpty()) {
+//            message = "No path exists between " + business1Name + " and " + business2Name;
+//        } else {
+            StringBuilder pathStringBuilder = new StringBuilder("Path: ");
+            for (Business business : path) {
+                pathStringBuilder.append(business.getName()).append(" -> ");
+            }
+            pathStringBuilder.delete(pathStringBuilder.length() - 4, pathStringBuilder.length());
+            message = pathStringBuilder.toString();
+//        }
 
         JLabel pathLabel = new JLabel(message);
         results.removeAll();
@@ -119,7 +148,6 @@ public class GUI2 {
         results.revalidate();
         results.repaint();
     }
-
 
     public static void main(String[] args) {
         new GUI2();
