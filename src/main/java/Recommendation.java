@@ -326,7 +326,7 @@ public class Recommendation {
 
 
     // ---=== Geographical Neighbors ===---
-    // Method to calculate distance between two points using Haversine formula
+    // calculate distance between two points using Haversine formula
     private static double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
         final int R = 6371; // Radius of the earth
 
@@ -341,7 +341,7 @@ public class Recommendation {
         return distance;
     }
 
-    // Method to find the four closest neighbors for each business
+    // find the four closest neighbors for each business
     public static Map<Business, List<Business>> findClosestNeighbors() {
         closestNeighborsMap = new HashMap<>();
 
@@ -370,7 +370,7 @@ public class Recommendation {
 
             // -+-TEST-+-
             closestNeighborsMap.put(b1, closestNeighbors);
-//                b1.setClosestNeighbors(closestNeighborsMap.get(b1)); //save the neighbors in each business
+//                b1.setClosestNeighbors(closestNeighborsMap.get(b1));
 //                System.out.println("Closest geographical businesses to: " + b1.getName() + "at: " + b1.getLatitude() + ", " + b1.getLongitude());
 //                System.out.println("    -" + b1.getClosestNeighbors().get(0));
 //                System.out.println("    -" + b1.getClosestNeighbors().get(1));
@@ -386,8 +386,6 @@ public class Recommendation {
 
     // ---=== Disjoint Sets ===---
     public static void processDisjointSets(Map<Business, List<Business>> closestNeighborsMap) {
-
-        // Initialize Disjoint Set
         DisjointSet disjointSet = new DisjointSet();
 
         // Make sets for all businesses in locaHM
@@ -417,7 +415,7 @@ public class Recommendation {
         int numberOfDisjointSets = roots.size();
         System.out.println("Number of disjoint sets: " + numberOfDisjointSets);
 
-        // Persistently Store Disjoint Sets
+        // Store Disjoint Sets
         try {
             DisjointSet.serialize(disjointSet, "disjoint_sets.ser");
             System.out.println("Disjoint sets stored successfully.");
@@ -428,7 +426,7 @@ public class Recommendation {
 
     public static Map<Business, List<Business>> buildAdjacencyList(Map<Business, List<Business>> closestNeighborsMap) {
         Map<Business, List<Business>> adjacencyList = new HashMap<>();
-        // Assuming closestNeighborsMap contains each business and a list of their closest neighbors
+        //  closestNeighborsMap contains each business and a list of their closest neighbors
         for (Map.Entry<Business, List<Business>> entry : closestNeighborsMap.entrySet()) {
             List<Business> neighbors = entry.getValue();
             adjacencyList.put(entry.getKey(), neighbors);
@@ -446,7 +444,7 @@ public class Recommendation {
         for (Business business : locaHM.keySet()) {
             disjointSet.makeSet(business);
         }
-        // Find disjoint sets from geographical neighbors
+        // disjoint sets from geographical neighbors
         for (Map.Entry<Business, List<Business>> entry : closestNeighborsMap.entrySet()) {
             Business root = disjointSet.find(entry.getKey());
             for (Business neighbor : entry.getValue()) {

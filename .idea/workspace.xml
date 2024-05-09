@@ -6,10 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="6f0ed166-6e77-4721-97bd-2def3faa0be1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/disjoint_sets.ser" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/GUI2.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/GUI2.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Graph.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Graph.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Node.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Node.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Recommendation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Recommendation.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Recommendation.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Recommendation.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -63,7 +61,7 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Recommendation">
+  <component name="RunManager" selected="Application.GUI2">
     <configuration name="GUI2" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="GUI2" />
       <module name="Project1" />
@@ -93,8 +91,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Recommendation" />
         <item itemvalue="Application.GUI2" />
+        <item itemvalue="Application.Recommendation" />
         <item itemvalue="Application.Graph" />
       </list>
     </recent_temporary>
